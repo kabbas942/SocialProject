@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .utils import getRandom
+from django.template.defaultfilters import slugify
 
 # Create your models here.
 class Profile(models.Model):
@@ -17,3 +19,18 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}-{self.created}"
+
+    def save(self,*args, **kwargs):
+        ex=False
+        if self.firstName and self.lastName:
+            
+            to_slug = slugify(str(self.firstName)+""+str(self.lastName))
+            print(to_slug)
+            ex = Profile.objects.filter(slug=to_slug).exists()
+            while ex:
+                to_slug = slugify(to_slug+""+str(getRandom()))
+                ex = Profile.objects.filter(slug=to_slug).exists()
+        else:
+            to_slug=str(self.user)
+        self.slug = to_slug
+        super().save(*args, **kwargs)
