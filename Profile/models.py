@@ -25,7 +25,6 @@ class Profile(models.Model):
         if self.firstName and self.lastName:
             
             to_slug = slugify(str(self.firstName)+""+str(self.lastName))
-            print(to_slug)
             ex = Profile.objects.filter(slug=to_slug).exists()
             while ex:
                 to_slug = slugify(to_slug+""+str(getRandom()))
@@ -34,3 +33,14 @@ class Profile(models.Model):
             to_slug=str(self.user)
         self.slug = to_slug
         super().save(*args, **kwargs)
+
+
+statusChoice =(('send','send'),('Accepted','Accepted'))
+class Relationship(models.Model):
+    sender=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name='sender')
+    receiver=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name='receiver')
+    status=models.CharField(max_length=8,choices=statusChoice)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+    def __str__(self):
+        return f"{self.sender}-{self.receiver}-{self.status}"
